@@ -36,10 +36,9 @@ public class Calculator extends Activity implements TextWatcher,
 						    View.OnKeyListener,
                                                     View.OnClickListener,
 						    AdapterView.OnItemClickListener,
-                                                    SharedPreferences.OnSharedPreferenceChangeListener
-{
-    static final char MINUS = '\u2212', TIMES = '\u00d7', DIV = '\u00f7', SQRT = '\u221a', PI = '\u03c0', 
-        UP_ARROW = '\u21e7', DN_ARROW = '\u21e9', ARROW = '\u21f3';
+                                                    SharedPreferences.OnSharedPreferenceChangeListener {
+    static final char MINUS = '\u2212', TIMES = '\u00d7', DIV = '\u00f7', SQRT = '\u221a', PI = '\u03c0',
+            UP_ARROW = '\u21e7', DN_ARROW = '\u21e9', ARROW = '\u21f3';
 
     private static final int MSG_INPUT_CHANGED = 1;
     private static final String INFINITY = "Infinity";
@@ -54,7 +53,7 @@ public class Calculator extends Activity implements TextWatcher,
     private GraphView graphView;
     private Graph3dView graph3dView;
     private History history;
-    private HistoryAdapter adapter;   
+    private HistoryAdapter adapter;
     private int nDigits = 0;
     private boolean pendingClearResult;
     private boolean isAlphaVisible;
@@ -65,22 +64,22 @@ public class Calculator extends Activity implements TextWatcher,
     static boolean useHighQuality3d = true;
 
     private static final char[][] ALPHA = {
-        {'q', 'w', '=', ',', ';', SQRT, '!', '\''},
-        {'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'},
-        {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k'},
-        {'z', 'x', 'c', 'v', 'b', 'n', 'm', 'l'},
+            {'q', 'w', '=', ',', ';', SQRT, '!', '\''},
+            {'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'},
+            {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k'},
+            {'z', 'x', 'c', 'v', 'b', 'n', 'm', 'l'},
     };
 
     private static final char[][] DIGITS = {
-        {'7', '8', '9', '%', '^', ARROW},
-        {'4', '5', '6','(', ')', 'C'},
-        {'1', '2', '3', TIMES, DIV, 'E'},
-        {'0', '0', '.', '+', MINUS, 'E'},
+            {'7', '8', '9', '%', '^', ARROW},
+            {'4', '5', '6', '(', ')', 'C'},
+            {'1', '2', '3', TIMES, DIV, 'E'},
+            {'0', '0', '.', '+', MINUS, 'E'},
     };
 
     private static final char[][] DIGITS2 = {
-        {'0', '.', '+', MINUS, TIMES, DIV, '^', '(', ')', 'C'},        
-        {'1', '2', '3', '4', '5', '6', '7', '8', '9', 'E'},
+            {'0', '.', '+', MINUS, TIMES, DIV, '^', '(', ')', 'C'},
+            {'1', '2', '3', '4', '5', '6', '7', '8', '9', 'E'},
     };
 
     /*
@@ -99,17 +98,17 @@ public class Calculator extends Activity implements TextWatcher,
     }
 
     private void internalConfigChange(Configuration config) {
-        setContentView(R.layout.main);  
+        setContentView(R.layout.main);
         graphView = (GraphView) findViewById(R.id.graph);
         graph3dView = (Graph3dView) findViewById(R.id.graph3d);
         historyView = (ListView) findViewById(R.id.history);
-              
+
         final boolean isLandscape = config.orientation == Configuration.ORIENTATION_LANDSCAPE;
         // final boolean hasKeyboard = config.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_NO;
-        
+
         alpha = (KeyboardView) findViewById(R.id.alpha);
         digits = (KeyboardView) findViewById(R.id.digits);
-        if (isLandscape) {                        
+        if (isLandscape) {
             digits.init(DIGITS2, false, true);
             isAlphaVisible = false;
         } else {
@@ -121,12 +120,12 @@ public class Calculator extends Activity implements TextWatcher,
         result = (TextView) findViewById(R.id.result);
 
         Editable oldText = input != null ? input.getText() : null;
-        input  = (EditText) findViewById(R.id.input);
+        input = (EditText) findViewById(R.id.input);
         input.setOnKeyListener(this);
         input.addTextChangedListener(this);
-        input.setEditableFactory(new CalculatorEditable.Factory());            
-        input.setInputType(0);
-	changeInput(history.getText());
+        input.setEditableFactory(new CalculatorEditable.Factory());
+        //input.setInputType(0);
+        changeInput(history.getText());
         if (oldText != null) {
             input.setText(oldText);
         }
@@ -135,7 +134,7 @@ public class Calculator extends Activity implements TextWatcher,
         graph3dView.setOnClickListener(this);
         if (historyView != null) {
             historyView.setAdapter(adapter);
-	    historyView.setOnItemClickListener(this);
+            historyView.setOnItemClickListener(this);
         }
     }
 
@@ -145,22 +144,22 @@ public class Calculator extends Activity implements TextWatcher,
         history = new History(this);
         adapter = new HistoryAdapter(this, history);
         internalConfigChange(getResources().getConfiguration());
-        
-	defs = new Defs(this, symbols);
-	if (history.fileNotFound) {
-	    String[] init = {
-		"sqrt(pi)\u00f70.5!",
-		"e^(i\u00d7pi)",
-		"ln(e^100)",
-                "sin(x)",
-                "x^2"
-	    };
-	    nDigits = 10;
-	    for (String s : init) {
-		onEnter(s);
-	    }
-	    nDigits = 0;
-	}
+
+        defs = new Defs(this, symbols);
+        if (history.fileNotFound) {
+            String[] init = {
+                    "sqrt(pi)\u00f70.5!",
+                    "e^(i\u00d7pi)",
+                    "ln(e^100)",
+                    "sin(x)",
+                    "x^2"
+            };
+            nDigits = 10;
+            for (String s : init) {
+                onEnter(s);
+            }
+            nDigits = 0;
+        }
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
         String value = prefs.getString("quality", null);
@@ -168,16 +167,16 @@ public class Calculator extends Activity implements TextWatcher,
             useHighQuality3d = calculator.Util.SDK_VERSION >= 5;
             prefs.edit().putString("quality", useHighQuality3d ? "high" : "low").commit();
         } else {
-            useHighQuality3d = value.equals("high");   
+            useHighQuality3d = value.equals("high");
         }
     }
-    
+
     public void onPause() {
         super.onPause();
         graph3dView.onPause();
-	history.updateEdited(input.getText().toString());
+        history.updateEdited(input.getText().toString());
         history.save();
-	defs.save();
+        defs.save();
     }
 
     public void onResume() {
@@ -190,7 +189,7 @@ public class Calculator extends Activity implements TextWatcher,
         (new MenuInflater(this)).inflate(R.menu.main, menu);
         return true;
     }
-    
+
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.findItem(R.id.clear_history).setEnabled(history.size() > 0);
@@ -200,41 +199,41 @@ public class Calculator extends Activity implements TextWatcher,
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
-	super.onOptionsItemSelected(item);
-	int id = item.getItemId();
-	switch (id) {
-	case R.id.list_defs: {
-	    startActivity(new Intent(this, ListDefs.class));
-	    break;
-	}
+        super.onOptionsItemSelected(item);
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.list_defs: {
+                startActivity(new Intent(this, ListDefs.class));
+                break;
+            }
 
-        case R.id.help:
-            startActivity(new Intent(this, Help.class));
-            break;
+            case R.id.help:
+                startActivity(new Intent(this, Help.class));
+                break;
 
-        case R.id.clear_history:
-            history.clear();
-            history.save();
-            adapter.notifyDataSetInvalidated();
-            break;
+            case R.id.clear_history:
+                history.clear();
+                history.save();
+                adapter.notifyDataSetInvalidated();
+                break;
 
-        case R.id.clear_defs:
-            defs.clear();
-            defs.save();
-            break;
+            case R.id.clear_defs:
+                defs.clear();
+                defs.save();
+                break;
 
-        case R.id.settings:
-            startActivity(new Intent(this, Settings.class));
-            break;
+            case R.id.settings:
+                startActivity(new Intent(this, Settings.class));
+                break;
 
-	default:
-	    return false;
-	}
-	return true;
+            default:
+                return false;
+        }
+        return true;
     }
 
     //OnSharedPreferenceChangeListener
-    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {       
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
         if (key.equals("quality")) {
             useHighQuality3d = prefs.getString(key, "high").equals("high");
             // Calculator.log("useHigh quality changed to " + useHighQuality3d);
@@ -250,10 +249,10 @@ public class Calculator extends Activity implements TextWatcher,
 
     // OnItemClickListener
     public void onItemClick(AdapterView parent, View view, int pos, long id) {
-	history.moveToPos(pos, input.getText().toString());
-	changeInput(history.getText());
+        history.moveToPos(pos, input.getText().toString());
+        changeInput(history.getText());
     }
-    
+
     // TextWatcher
     public void afterTextChanged(Editable s) {
         // handler.removeMessages(MSG_INPUT_CHANGED);
@@ -269,7 +268,7 @@ public class Calculator extends Activity implements TextWatcher,
 	}
         */
     }
-    
+
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
     }
 
@@ -282,29 +281,29 @@ public class Calculator extends Activity implements TextWatcher,
         int action = event.getAction();
         if (action == KeyEvent.ACTION_DOWN) {
             switch (keyCode) {
-            case KeyEvent.KEYCODE_ENTER:
-            case KeyEvent.KEYCODE_DPAD_CENTER:
-                doEnter();
-                break;
-                
-            case KeyEvent.KEYCODE_DPAD_UP:
-                onUp();
-                break;
-                
-            case KeyEvent.KEYCODE_DPAD_DOWN:            
-                onDown();
-                break;
-            default:
-                return false;
+                case KeyEvent.KEYCODE_ENTER:
+                case KeyEvent.KEYCODE_DPAD_CENTER:
+                    doEnter();
+                    break;
+
+                case KeyEvent.KEYCODE_DPAD_UP:
+                    onUp();
+                    break;
+
+                case KeyEvent.KEYCODE_DPAD_DOWN:
+                    onDown();
+                    break;
+                default:
+                    return false;
             }
             return true;
         } else {
             switch (keyCode) {
-            case KeyEvent.KEYCODE_ENTER:
-            case KeyEvent.KEYCODE_DPAD_CENTER:
-            case KeyEvent.KEYCODE_DPAD_UP:
-            case KeyEvent.KEYCODE_DPAD_DOWN:
-                return true;
+                case KeyEvent.KEYCODE_ENTER:
+                case KeyEvent.KEYCODE_DPAD_CENTER:
+                case KeyEvent.KEYCODE_DPAD_UP:
+                case KeyEvent.KEYCODE_DPAD_DOWN:
+                    return true;
             }
             return false;
         }
@@ -331,13 +330,13 @@ public class Calculator extends Activity implements TextWatcher,
     void evaluate() {
         evaluate(input.getText().toString());
     }
-    
+
     private String formatEval(Complex value) {
-	if (nDigits == 0) {
+        if (nDigits == 0) {
             nDigits = getResultSpace();
         }
-	String res = Util.complexToString(value, nDigits, 2);
-	return res.replace(INFINITY, INFINITY_UNICODE);
+        String res = Util.complexToString(value, nDigits, 2);
+        return res.replace(INFINITY, INFINITY_UNICODE);
     }
 
     private void evaluate(String text) {
@@ -350,8 +349,8 @@ public class Calculator extends Activity implements TextWatcher,
         auxFuncs.clear();
         int end = -1;
         do {
-            text = text.substring(end+1);
-            end  = text.indexOf(';');
+            text = text.substring(end + 1);
+            end = text.indexOf(';');
             String slice = end == -1 ? text : text.substring(0, end);
             try {
                 Function f = symbols.compile(slice);
@@ -360,7 +359,7 @@ public class Calculator extends Activity implements TextWatcher,
                 continue;
             }
         } while (end != -1);
-        
+
         graphedFunction = auxFuncs;
         int size = auxFuncs.size();
         if (size == 0) {
@@ -393,7 +392,7 @@ public class Calculator extends Activity implements TextWatcher,
                 historyView.setVisibility(View.GONE);
                 graph3dView.setVisibility(View.GONE);
                 graph3dView.onPause();
-                graphView.setVisibility(View.VISIBLE);                
+                graphView.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -405,11 +404,12 @@ public class Calculator extends Activity implements TextWatcher,
     }
 
     private void updateAlpha() {
-        alpha.setVisibility(isAlphaVisible ? View.VISIBLE: View.GONE);
-        digits.setAboveView(isAlphaVisible ? alpha : null);        
+        alpha.setVisibility(isAlphaVisible ? View.VISIBLE : View.GONE);
+        digits.setAboveView(isAlphaVisible ? alpha : null);
     }
 
     private StringBuilder oneChar = new StringBuilder(" ");
+
     void onKey(char key) {
         if (key == 'E') {
             doEnter();
@@ -467,30 +467,30 @@ public class Calculator extends Activity implements TextWatcher,
     }
 
     void onEnter() {
-	onEnter(input.getText().toString());
+        onEnter(input.getText().toString());
     }
 
     void onEnter(String text) {
-	boolean historyChanged = false;
-	try {
-	    FunctionAndName fan = symbols.compileWithName(text);
-	    if (fan.name != null) {
-		symbols.define(fan);
-		defs.add(text);
-	    }
-	    Function f = fan.function;
+        boolean historyChanged = false;
+        try {
+            FunctionAndName fan = symbols.compileWithName(text);
+            if (fan.name != null) {
+                symbols.define(fan);
+                defs.add(text);
+            }
+            Function f = fan.function;
             int arity = f.arity();
             Complex value = null;
             if (arity == 0) {
                 value = f.evalComplex();
                 symbols.define("ans", value);
             }
-	    historyChanged = arity == 0 ?
-		history.onEnter(text, formatEval(value)) :
-		history.onEnter(text, null);
-	} catch (SyntaxException e) {
-	    historyChanged = history.onEnter(text, null);
-	}
+            historyChanged = arity == 0 ?
+                    history.onEnter(text, formatEval(value)) :
+                    history.onEnter(text, null);
+        } catch (SyntaxException e) {
+            historyChanged = history.onEnter(text, null);
+        }
         showGraph(null);
         if (historyChanged) {
             adapter.notifyDataSetInvalidated();
@@ -498,12 +498,12 @@ public class Calculator extends Activity implements TextWatcher,
         if (text.length() == 0) {
             result.setText(null);
         }
-	changeInput(history.getText());
+        changeInput(history.getText());
     }
-    
+
     private void changeInput(String newInput) {
         input.setText(newInput);
-	input.setSelection(newInput.length());
+        input.setSelection(newInput.length());
         /*
 	if (newInput.length() > 0) {
 	    result.setText(null);
@@ -542,10 +542,10 @@ public class Calculator extends Activity implements TextWatcher,
             // updateChecked();
         }
     }
-    
-    private static final KeyEvent 
-        KEY_DEL = new KeyEvent(0, KeyEvent.KEYCODE_DEL),
-        KEY_ENTER = new KeyEvent(0, KeyEvent.KEYCODE_ENTER);
+
+    private static final KeyEvent
+            KEY_DEL = new KeyEvent(0, KeyEvent.KEYCODE_DEL),
+            KEY_ENTER = new KeyEvent(0, KeyEvent.KEYCODE_ENTER);
 
     void doEnter() {
         onEnter();
@@ -555,5 +555,5 @@ public class Calculator extends Activity implements TextWatcher,
         input.dispatchKeyEvent(KEY_DEL);
     }
 
-    
+
 }
